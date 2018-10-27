@@ -17,12 +17,23 @@ export const createAccount = function(opts) {
   if (!StrKey.isValidEd25519PublicKey(opts.destination)) {
     throw new Error("destination is invalid");
   }
+
   if (!this.isValidAmount(opts.startingBalance)) {
     throw new TypeError(this.constructAmountRequirementsError('startingBalance'));
   }
+
+  opts.accountType = opts.accountType || null;
+  if (opts.accountType == null) {
+    throw new Error("accountType is invalid");
+  }
+
+  var type = xdr.AccountType.fromValue(opts.accountType);
+  
   let attributes = {};
   attributes.destination     = Keypair.fromPublicKey(opts.destination).xdrAccountId();
   attributes.startingBalance = this._toXDRAmount(opts.startingBalance);
+  attributes.accountType = type.value;
+
   let createAccount          = new xdr.CreateAccountOp(attributes);
 
   let opAttributes = {};

@@ -12,7 +12,7 @@ typedef opaque Thresholds[4];
 typedef string string32<32>;
 typedef string string64<64>;
 typedef int64 SequenceNumber;
-typedef opaque DataValue<64>;
+typedef opaque DataValue<64>; 
 
 enum AssetType
 {
@@ -43,17 +43,22 @@ case ASSET_TYPE_CREDIT_ALPHANUM12:
     // add other asset types here in the future
 };
 
+// Defines account roles 
+enum AccountType 
+{
+    FOUNDATION = 0,
+    LBO = 1,
+    REGULATOR = 2,
+    ISSUER = 3,
+    CLIENT = 4
+};
+
+
 // price in fractional representation
 struct Price
 {
     int32 n; // numerator
     int32 d; // denominator
-};
-
-struct Liabilities
-{
-    int64 buying;
-    int64 selling;
 };
 
 // the 'Thresholds' type is packed uint8_t values
@@ -116,6 +121,8 @@ struct AccountEntry
     AccountID* inflationDest; // Account to vote for during inflation
     uint32 flags;             // see AccountFlags
 
+    uint32 accountType;           // Account role
+
     string32 homeDomain; // can be used for reverse federation and memo lookup
 
     // fields used for signatures
@@ -129,18 +136,6 @@ struct AccountEntry
     {
     case 0:
         void;
-    case 1:
-        struct
-        {
-            Liabilities liabilities;
-
-            union switch (int v)
-            {
-            case 0:
-                void;
-            }
-            ext;
-        } v1;
     }
     ext;
 };
@@ -156,6 +151,7 @@ enum TrustLineFlags
     // issuer has authorized account to perform transactions with its credit
     AUTHORIZED_FLAG = 1
 };
+
 
 // mask for all trustline flags
 const MASK_TRUSTLINE_FLAGS = 1;
@@ -175,18 +171,6 @@ struct TrustLineEntry
     {
     case 0:
         void;
-    case 1:
-        struct
-        {
-            Liabilities liabilities;
-
-            union switch (int v)
-            {
-            case 0:
-                void;
-            }
-            ext;
-        } v1;
     }
     ext;
 };
@@ -249,6 +233,7 @@ struct DataEntry
     }
     ext;
 };
+
 
 struct LedgerEntry
 {

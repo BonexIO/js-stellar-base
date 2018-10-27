@@ -29,6 +29,8 @@ enum OperationType
     BUMP_SEQUENCE = 11
 };
 
+
+
 /* CreateAccount
 Creates and funds a new account with the specified starting balance.
 
@@ -38,10 +40,13 @@ Result: CreateAccountResult
 
 */
 
+
 struct CreateAccountOp
 {
     AccountID destination; // account to create
     int64 startingBalance; // amount they end up with
+    uint32 accountType; // role of the account
+
 };
 
 /* Payment
@@ -145,6 +150,9 @@ struct SetOptionsOp
     // Add, update or remove a signer for the account
     // signer is deleted if the weight is 0
     Signer* signer;
+
+    // Sets the Merchant API url
+    string64* merchantApi;
 };
 
 /* Creates, updates or deletes a trust line
@@ -387,7 +395,9 @@ enum CreateAccountResultCode
     CREATE_ACCOUNT_UNDERFUNDED = -2, // not enough funds in source account
     CREATE_ACCOUNT_LOW_RESERVE =
         -3, // would create an account below the min reserve
-    CREATE_ACCOUNT_ALREADY_EXIST = -4 // account already exists
+    CREATE_ACCOUNT_ALREADY_EXIST = -4, // account already exists
+
+    CREATE_ACCOUNT_UNDERAUTHORIZED = -5 // source account doesnt have enought rights to create this type of account
 };
 
 union CreateAccountResult switch (CreateAccountResultCode code)
@@ -608,9 +618,7 @@ enum AccountMergeResultCode
     ACCOUNT_MERGE_NO_ACCOUNT = -2,      // destination does not exist
     ACCOUNT_MERGE_IMMUTABLE_SET = -3,   // source account has AUTH_IMMUTABLE set
     ACCOUNT_MERGE_HAS_SUB_ENTRIES = -4, // account has trust lines/offers
-    ACCOUNT_MERGE_SEQNUM_TOO_FAR = -5,  // sequence number is over max allowed
-    ACCOUNT_MERGE_DEST_FULL = -6        // can't add source balance to
-                                        // destination balance
+    ACCOUNT_MERGE_SEQNUM_TOO_FAR = -5   // sequence number is over max allowed
 };
 
 union AccountMergeResult switch (AccountMergeResultCode code)
