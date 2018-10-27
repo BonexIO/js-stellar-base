@@ -41,7 +41,7 @@ gulp.task('hooks:precommit', ['build'], function() {
 
 gulp.task('build:node', ['lint:src'], function() {
     return gulp.src('src/**/*.js')
-        .pipe(plugins.babel())
+        .pipe(plugins.babel({presets: ['es2015']}))
         .pipe(gulp.dest('lib'));
 });
 
@@ -61,11 +61,11 @@ gulp.task('build:browser', ['lint:src'], function() {
     }))
     .pipe(plugins.rename('stellar-base.js'))
     .pipe(gulp.dest('dist'))
-    .pipe(plugins.uglify({
-      output: {
-        ascii_only: true
-      }
-    }))
+    // .pipe(plugins.uglify({
+      // output: {
+        // ascii_only: true
+      // }
+    // }))
     .pipe(plugins.rename('stellar-base.min.js'))
     .pipe(gulp.dest('dist'));
 });
